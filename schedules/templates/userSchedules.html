@@ -1,0 +1,29 @@
+{{define "userSchedules"}}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Расписания</title>
+    </head>
+    <body>
+    ТЕКУЩИЕ
+    <div>
+        {{range .CurrentSchedules}}
+            {{.MedicamentName}} до {{.DateEnd | TimeToDate}}<br>
+            {{range .ScheduleOnDay}}
+                {{. | MinuteToTime}}<br>
+            {{end}}<br>
+        {{end}}
+    </div>
+    ЗАВЕРШЕННЫЕ
+    <div>
+        {{range .PastSchedules}}
+            {{.MedicamentName}} до {{.DateEnd | TimeToDate}}<br>
+            {{range .ScheduleOnDay}}
+                {{. | MinuteToTime}}<br>
+            {{end}}<br>
+        {{end}}
+    </div>
+    </body>
+    </html>
+{{end}}
