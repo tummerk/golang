@@ -4,6 +4,13 @@ import (
 	"time"
 )
 
+/*
+Почему в Schedule нет поля userID?
+с текущим функционалом все команды подразумевают изначальное наличие userID в самом запросе
+/schedules?user_id=2 ну и мы ищем schedule в базе данных только по user_id, конечно можно было бы добавить но это нигде
+бы не использовалось
+*/
+
 type Schedule struct {
 	ID               int
 	MedicamentName   string
@@ -12,7 +19,7 @@ type Schedule struct {
 	DateEnd          time.Time
 }
 
-func (schedule Schedule) ScheduleOnDay() []int {
+func (schedule Schedule) ScheduleOnDay() []int { //создание массива состоящего из времени приемов (в мин от начала дня)
 	var takingMedications []int
 	minuteFromStartDay := 480
 	minuteAvaliable := 840

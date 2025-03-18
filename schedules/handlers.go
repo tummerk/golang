@@ -8,7 +8,7 @@ import (
 	"strconv"
 )
 
-func scheduleCreateHandler(w http.ResponseWriter, r *http.Request) {
+func scheduleCreateHandler(w http.ResponseWriter, r *http.Request) { //форма создания расписания
 	t, e := template.ParseFiles("templates/scheduleCreate.html")
 	if e != nil {
 		fmt.Println(e)
@@ -18,23 +18,28 @@ func scheduleCreateHandler(w http.ResponseWriter, r *http.Request) {
 
 func scheduleHandler(w http.ResponseWriter, r *http.Request) {
 	switch {
-	case r.Method == http.MethodPost:
+	case r.Method == http.MethodPost: //занесение нового расписания в бд
 		e := r.ParseForm()
 		if e != nil {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
+		//получаем данные
 		medicamentName := r.FormValue("medicamentName")
-		userID, e := strconv.Atoi(r.FormValue("userID"))
-		receptionsPerDay, e := strconv.Atoi(r.FormValue("receptionsPerDay"))
-		duration, e := strconv.Atoi(r.FormValue("duration"))
-		if e != nil {
+		userID, e1 := strconv.Atoi(r.FormValue("userID"))
+		receptionsPerDay, e2 := strconv.Atoi(r.FormValue("receptionsPerDay"))
+		duration, e3 := strconv.Atoi(r.FormValue("duration"))
+
+		if e1 != nil || e2 != nil || e3 != nil {
 			http.Error(w, "вы указали не число в полях где это нужно", http.StatusBadRequest)
 			return
 		}
 		scheduleID, e := NewSchedule(medicamentName, userID, receptionsPerDay, duration)
+
+		//возвращаем ID нового расписания
 		w.Write([]byte(strconv.Itoa(int(scheduleID))))
-	case r.Method == http.MethodGet:
+	case r.Method == http.MethodGet: //поиск schedule по ID и user_id
+
 		funcmap := template.FuncMap{ //передача функции преобразования минут в время
 			"MinuteToTime": MinuteToTime,
 			"TimeToDate":   TimeToDate,
@@ -75,13 +80,13 @@ func scheduleHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func userSchedulesHandler(w http.ResponseWriter, r *http.Request) {
+func userSchedulesHandler(w http.ResponseWriter, r *http.Request) { //получение всех расписаний для user
 	if r.Method != http.MethodGet {
 		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
 		return
 	}
 
-	funcmap := template.FuncMap{ //передача функции преобразования минут в время
+	funcmap := template.FuncMap{ //передача функции
 		"MinuteToTime": MinuteToTime,
 		"TimeToDate":   TimeToDate,
 	}

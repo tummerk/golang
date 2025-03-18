@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+//тут вспомогательные функции
+
 // округление  вверх
 func roundUp(num, multiple int) int {
 	if num%15 == 0 {
