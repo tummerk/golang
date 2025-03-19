@@ -29,9 +29,12 @@ func scheduleHandler(w http.ResponseWriter, r *http.Request) {
 		userID, e1 := strconv.Atoi(r.FormValue("userID"))
 		receptionsPerDay, e2 := strconv.Atoi(r.FormValue("receptionsPerDay"))
 		duration, e3 := strconv.Atoi(r.FormValue("duration"))
-
+		if receptionsPerDay > 15 || receptionsPerDay < 1 {
+			http.Error(w, "количество приёмов должно быть от 1 до 15", http.StatusBadRequest)
+			return
+		}
 		if e1 != nil || e2 != nil || e3 != nil {
-			http.Error(w, "вы указали не число в полях где это нужно", http.StatusBadRequest)
+			http.Error(w, "вы указали не целое число в полях где это нужно", http.StatusBadRequest)
 			return
 		}
 		scheduleID, e := NewSchedule(medicamentName, userID, receptionsPerDay, duration)
