@@ -82,8 +82,8 @@ func NewSchedule(medicamentName string, userId, receptionsPerDay, duration int) 
 								     "date_end"
 								   )
 								 VALUES
-								   ($1, $2, $3, $4, $5)
-								 RETURNING id`, medicamentName, userId, receptionsPerDay, dateStart, dateEnd)
+	($1, $2, $3, $4, $5)
+	RETURNING id`, medicamentName, userId, receptionsPerDay, dateStart, dateEnd)
 	if e != nil {
 		return 0, e
 	}
