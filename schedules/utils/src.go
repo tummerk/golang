@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 //тут вспомогательные функции
 
 // округление  вверх
-func roundUp(num, multiple int) int {
+func RoundUp(num, multiple int) int {
 	if num%15 == 0 {
 		return num
 	}

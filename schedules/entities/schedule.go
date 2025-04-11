@@ -1,6 +1,7 @@
-package main
+package entities
 
 import (
+	"first_project/utils"
 	"time"
 )
 
@@ -31,7 +32,7 @@ func (schedule Schedule) ScheduleOnDay() []int { //создание массив
 	time := minuteFromStartDay
 
 	for i := 0; i < schedule.ReceptionsPerDay; i++ {
-		takingMedications = append(takingMedications, roundUp(time, 15)) //добавляем кратное 15 минутам время
+		takingMedications = append(takingMedications, utils.RoundUp(time, 15)) //добавляем кратное 15 минутам время
 		time += step
 	}
 

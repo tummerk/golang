@@ -1,6 +1,10 @@
-package main
+package controller
 
 import (
+	"first_project/entities"
+	"first_project/repository"
+	"first_project/useCase"
+	"first_project/utils"
 	"fmt"
 	"html/template"
 	"log"
@@ -8,7 +12,15 @@ import (
 	"strconv"
 )
 
-func scheduleCreateHandler(w http.ResponseWriter, r *http.Request) { //форма создания расписания
+type ScheduleController struct {
+	UC useCase.ScheduleUC
+}
+
+func NewScheduleController(repo repository.ScheduleRepository) *ScheduleController {
+	return &ScheduleController{*useCase.NewScheduleUC(repo)}
+}
+
+func (c ScheduleController) Create(w http.ResponseWriter, r *http.Request) {
 	t, e := template.ParseFiles("templates/scheduleCreate.html")
 	if e != nil {
 		fmt.Println(e)
@@ -16,7 +28,44 @@ func scheduleCreateHandler(w http.ResponseWriter, r *http.Request) { //форм�
 	t.ExecuteTemplate(w, "scheduleCreate", nil)
 }
 
-func scheduleHandler(w http.ResponseWriter, r *http.Request) {
+func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
+		return
+	}
+
+	funcmap := template.FuncMap{ //передача функции
+		"MinuteToTime": utils.MinuteToTime,
+		"TimeToDate":   utils.TimeToDate,
+	}
+	t, e := template.New("").Funcs(funcmap).ParseFiles("templates/userSchedules.html")
+	if e != nil {
+		log.Fatal(e)
+	}
+
+	query := r.URL.Query()
+	userID, e := strconv.Atoi(query.Get("user_id"))
+	if e != nil {
+		http.Error(w, "укажите число!", http.StatusBadRequest)
+		return
+	}
+
+	currentSchedules, e, pastSchedules := c.UC.GetUserSchedules(userID)
+
+	if e != nil || len(currentSchedules)+len(pastSchedules) == 0 {
+		http.Error(w, "Такому пользователю лекарства не назначались!", http.StatusBadRequest)
+		return
+	}
+
+	data := struct {
+		CurrentSchedules []entities.Schedule
+		PastSchedules    []entities.Schedule
+	}{currentSchedules,
+		pastSchedules}
+	t.ExecuteTemplate(w, "userSchedules", data)
+}
+
+func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case r.Method == http.MethodPost: //занесение нового расписания в бд
 		e := r.ParseForm()
@@ -37,15 +86,15 @@ func scheduleHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "вы указали не целое число в полях где это нужно", http.StatusBadRequest)
 			return
 		}
-		scheduleID, e := NewSchedule(medicamentName, userID, receptionsPerDay, duration)
+		scheduleID, e := c.UC.Create(medicamentName, userID, receptionsPerDay, duration)
 
 		//возвращаем ID нового расписания
 		w.Write([]byte(strconv.Itoa(int(scheduleID))))
 	case r.Method == http.MethodGet: //поиск schedule по ID и user_id
 
 		funcmap := template.FuncMap{ //передача функции преобразования минут в время
-			"MinuteToTime": MinuteToTime,
-			"TimeToDate":   TimeToDate,
+			"MinuteToTime": utils.MinuteToTime,
+			"TimeToDate":   utils.TimeToDate,
 		}
 		t, e := template.New("").Funcs(funcmap).ParseFiles("templates/userSchedule.html")
 
@@ -61,14 +110,14 @@ func scheduleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		schedule, e, isRelevant := UserShedule(userID, scheduleID)
+		schedule, e, isRelevant := c.UC.GetUserSchedule(userID, scheduleID)
 		if e != nil {
 			http.Error(w, "такого расписания не существует", http.StatusBadRequest)
 			return
 		}
 
 		data := struct {
-			Schedule   Schedule
+			Schedule   entities.Schedule
 			IsRelevant bool
 		}{
 			Schedule:   schedule,
@@ -80,47 +129,9 @@ func scheduleHandler(w http.ResponseWriter, r *http.Request) {
 	default:
 		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
 	}
-
 }
 
-func userSchedulesHandler(w http.ResponseWriter, r *http.Request) { //получение всех расписаний для user
-	if r.Method != http.MethodGet {
-		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
-		return
-	}
-
-	funcmap := template.FuncMap{ //передача функции
-		"MinuteToTime": MinuteToTime,
-		"TimeToDate":   TimeToDate,
-	}
-
-	t, e := template.New("").Funcs(funcmap).ParseFiles("templates/userSchedules.html")
-	if e != nil {
-		log.Fatal(e)
-	}
-
-	query := r.URL.Query()
-	userID, e := strconv.Atoi(query.Get("user_id"))
-	if e != nil {
-		http.Error(w, "укажите число!", http.StatusBadRequest)
-		return
-	}
-	currentSchedules, e, pastSchedules := UserShedules(userID)
-	fmt.Println(currentSchedules)
-	if e != nil || len(currentSchedules)+len(pastSchedules) == 0 {
-		http.Error(w, "Такому пользователю лекарства не назначались!", http.StatusBadRequest)
-		return
-	}
-
-	data := struct {
-		CurrentSchedules []Schedule
-		PastSchedules    []Schedule
-	}{currentSchedules,
-		pastSchedules}
-	t.ExecuteTemplate(w, "userSchedules", data)
-}
-
-func nextTakingsHandler(w http.ResponseWriter, r *http.Request) {
+func (c ScheduleController) NextTakings(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
 		return
@@ -135,7 +146,7 @@ func nextTakingsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	nextTakings, e := NextTakings(userID)
+	nextTakings, e := c.UC.NextTakings(userID)
 	if e != nil {
 		http.Error(w, "неверный user_id", http.StatusBadRequest)
 		return
