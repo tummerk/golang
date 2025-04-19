@@ -1,0 +1,51 @@
+openapi: 3.0.3
+info:
+  description: API для работы с расписаниями
+  title: Schedules API
+  version: 1.0.0
+servers:
+- url: http://localhost:5252/v1
+paths: {}
+components:
+  schemas:
+    taking:
+      properties:
+        name:
+          example: парацетамол
+          type: string
+        time:
+          example: 12:40
+          type: string
+      required:
+      - name
+      - time
+      type: object
+    takings:
+      items:
+        $ref: '#/components/schemas/taking'
+      type: array
+    Schedule:
+      properties:
+        medicamentName:
+          example: парацетамол
+          type: string
+        takings:
+          example:
+          - 23:30
+          - 3:00
+          items:
+            type: string
+          type: array
+      required:
+      - dateEnd
+      - dateStart
+      - id
+      - medicamentName
+      - receptionsPerDay
+      type: object
+    Error:
+      properties:
+        error:
+          example: Missing request
+          type: string
+      type: object

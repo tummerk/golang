@@ -4,7 +4,7 @@
       <root>
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-0" />
         <mxCell id="WIyWlLk6GJQsqaUBKTNV-1" parent="WIyWlLk6GJQsqaUBKTNV-0" />
-        <mxCell id="mBVzikVq4SRkZcjjKvhs-25" value="Schedule (entities)" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
+        <mxCell id="mBVzikVq4SRkZcjjKvhs-25" value="ScheduleJSON (entities)" style="swimlane;fontStyle=0;childLayout=stackLayout;horizontal=1;startSize=26;fillColor=none;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;" parent="WIyWlLk6GJQsqaUBKTNV-1" vertex="1">
           <mxGeometry x="430" y="310" width="210" height="156" as="geometry">
             <mxRectangle x="430" y="310" width="90" height="30" as="alternateBounds" />
           </mxGeometry>
@@ -41,13 +41,13 @@
         <mxCell id="mBVzikVq4SRkZcjjKvhs-48" value="+Create(string,int,int,int) (int,error)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="mBVzikVq4SRkZcjjKvhs-43" vertex="1">
           <mxGeometry y="60" width="310" height="26" as="geometry" />
         </mxCell>
-        <mxCell id="mBVzikVq4SRkZcjjKvhs-49" value="+ GetUserSchedules (int) ([]Schedule,[]Schedule,error)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="mBVzikVq4SRkZcjjKvhs-43" vertex="1">
+        <mxCell id="mBVzikVq4SRkZcjjKvhs-49" value="+ GetUserSchedules (int) ([]ScheduleJSON,[]ScheduleJSON,error)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="mBVzikVq4SRkZcjjKvhs-43" vertex="1">
           <mxGeometry y="86" width="310" height="26" as="geometry" />
         </mxCell>
         <mxCell id="mBVzikVq4SRkZcjjKvhs-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="mBVzikVq4SRkZcjjKvhs-43" source="mBVzikVq4SRkZcjjKvhs-44" target="mBVzikVq4SRkZcjjKvhs-44" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
-        <mxCell id="mBVzikVq4SRkZcjjKvhs-53" value="+ GetUserSchedule (int,int) (Schedule,bool,error)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="mBVzikVq4SRkZcjjKvhs-43" vertex="1">
+        <mxCell id="mBVzikVq4SRkZcjjKvhs-53" value="+ GetUserSchedule (int,int) (ScheduleJSON,bool,error)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="mBVzikVq4SRkZcjjKvhs-43" vertex="1">
           <mxGeometry y="112" width="310" height="26" as="geometry" />
         </mxCell>
         <mxCell id="mBVzikVq4SRkZcjjKvhs-60" value="+ NextTakings(int) ([]string,error)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="mBVzikVq4SRkZcjjKvhs-43" vertex="1">

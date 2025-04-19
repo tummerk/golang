@@ -1,11 +1,13 @@
 package controller
 
 import (
+	"encoding/json"
 	"first_project/entities"
 	"first_project/repository"
 	"first_project/useCase"
 	"first_project/utils"
 	"fmt"
+	"github.com/tummerk/schedules/generated"
 	"html/template"
 	"log"
 	"net/http"
@@ -92,12 +94,6 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 		w.Write([]byte(strconv.Itoa(int(scheduleID))))
 	case r.Method == http.MethodGet: //поиск schedule по ID и user_id
 
-		funcmap := template.FuncMap{ //передача функции преобразования минут в время
-			"MinuteToTime": utils.MinuteToTime,
-			"TimeToDate":   utils.TimeToDate,
-		}
-		t, e := template.New("").Funcs(funcmap).ParseFiles("templates/userSchedule.html")
-
 		query := r.URL.Query()
 		userID, e := strconv.Atoi(query.Get("user_id"))
 		if e != nil {
@@ -115,17 +111,17 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 			http.Error(w, "такого расписания не существует", http.StatusBadRequest)
 			return
 		}
-
-		data := struct {
-			Schedule   entities.Schedule
-			IsRelevant bool
-		}{
-			Schedule:   schedule,
-			IsRelevant: isRelevant,
+		takings := make([]string, 0)
+		for _, v := range schedule.ScheduleOnDay() {
+			takings = append(takings, utils.MinuteToTime(v))
 		}
+		var scheduleJSON = schedules.ScheduleJSON{schedule.MedicamentName, takings}
 
-		t.ExecuteTemplate(w, "userSchedule", data)
-
+		response := map[string]interface{}{
+			"scheduleJSON": scheduleJSON,
+			"isRelevant":   isRelevant,
+		}
+		json.NewEncoder(w).Encode(response)
 	default:
 		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
 	}

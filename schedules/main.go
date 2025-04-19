@@ -12,9 +12,7 @@ import (
 func main() {
 	repo := repository.PostgresRepository{}
 	cont := controller.NewScheduleController(&repo)
-	
+
 	a := app.NewApp(cont)
 	a.Run()
 }
-
-// запуск миграций
