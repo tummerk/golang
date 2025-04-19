@@ -7,7 +7,6 @@ import (
 	"first_project/useCase"
 	"first_project/utils"
 	"fmt"
-	"github.com/tummerk/schedules/generated"
 	"html/template"
 	"log"
 	"net/http"
@@ -115,7 +114,7 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 		for _, v := range schedule.ScheduleOnDay() {
 			takings = append(takings, utils.MinuteToTime(v))
 		}
-		var scheduleJSON = schedules.ScheduleJSON{schedule.MedicamentName, takings}
+		var scheduleJSON = api.ScheduleJSON{schedule.MedicamentName, takings}
 
 		response := map[string]interface{}{
 			"scheduleJSON": scheduleJSON,

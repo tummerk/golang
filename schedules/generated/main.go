@@ -11,10 +11,9 @@
 package main
 
 import (
+	schedules "github.com/GIT_USER_ID/GIT_REPO_ID/api"
 	"log"
 	"net/http"
-
-	schedules "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 )
 
 func main() {

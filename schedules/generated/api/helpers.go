@@ -8,7 +8,7 @@
  * API version: 1.0.0
  */
 
-package schedules
+package api
 
 import (
 	"reflect"
@@ -16,7 +16,7 @@ import (
 
 // Response return a ImplResponse struct filled
 func Response(code int, body interface{}) ImplResponse {
-	return ImplResponse {
+	return ImplResponse{
 		Code: code,
 		Body: body,
 	}

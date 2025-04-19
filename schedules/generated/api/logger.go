@@ -8,7 +8,7 @@
  * API version: 1.0.0
  */
 
-package schedules
+package api
 
 import (
 	"log"

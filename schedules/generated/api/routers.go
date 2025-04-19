@@ -8,12 +8,11 @@
  * API version: 1.0.0
  */
 
-package schedules
+package api
 
 import (
 	"encoding/json"
 	"errors"
-	"time"
 	"github.com/gorilla/mux"
 	"io"
 	"mime/multipart"
@@ -22,6 +21,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 // A Route defines the parameters for an api endpoint
