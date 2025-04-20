@@ -2,13 +2,11 @@ package controller
 
 import (
 	"encoding/json"
-	"first_project/entities"
+	"first_project/openapi"
 	"first_project/repository"
 	"first_project/useCase"
-	"first_project/utils"
 	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 )
@@ -35,15 +33,6 @@ func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	funcmap := template.FuncMap{ //передача функции
-		"MinuteToTime": utils.MinuteToTime,
-		"TimeToDate":   utils.TimeToDate,
-	}
-	t, e := template.New("").Funcs(funcmap).ParseFiles("templates/userSchedules.html")
-	if e != nil {
-		log.Fatal(e)
-	}
-
 	query := r.URL.Query()
 	userID, e := strconv.Atoi(query.Get("user_id"))
 	if e != nil {
@@ -57,13 +46,23 @@ func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Такому пользователю лекарства не назначались!", http.StatusBadRequest)
 		return
 	}
+	currentSchedulesJson := []openapi.ScheduleJSON{}
+	for _, schedule := range currentSchedules {
+		takings := schedule.ScheduleOnDayString()
+		currentSchedulesJson = append(currentSchedulesJson, openapi.ScheduleJSON{schedule.MedicamentName, takings})
+	}
 
-	data := struct {
-		CurrentSchedules []entities.Schedule
-		PastSchedules    []entities.Schedule
-	}{currentSchedules,
-		pastSchedules}
-	t.ExecuteTemplate(w, "userSchedules", data)
+	pastSchedulesJson := []openapi.ScheduleJSON{}
+	for _, schedule := range pastSchedules {
+		takings := schedule.ScheduleOnDayString()
+		currentSchedulesJson = append(currentSchedulesJson, openapi.ScheduleJSON{schedule.MedicamentName, takings})
+	}
+
+	response := map[string]interface{}{
+		"current_schedules": currentSchedulesJson,
+		"past_schedules":    pastSchedulesJson,
+	}
+	json.NewEncoder(w).Encode(response)
 }
 
 func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Request) {
@@ -106,15 +105,9 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 		}
 
 		schedule, e, isRelevant := c.UC.GetUserSchedule(userID, scheduleID)
-		if e != nil {
-			http.Error(w, "такого расписания не существует", http.StatusBadRequest)
-			return
-		}
-		takings := make([]string, 0)
-		for _, v := range schedule.ScheduleOnDay() {
-			takings = append(takings, utils.MinuteToTime(v))
-		}
-		var scheduleJSON = api.ScheduleJSON{schedule.MedicamentName, takings}
+
+		takings := schedule.ScheduleOnDayString()
+		var scheduleJSON = openapi.ScheduleJSON{schedule.MedicamentName, takings}
 
 		response := map[string]interface{}{
 			"scheduleJSON": scheduleJSON,
@@ -132,8 +125,6 @@ func (c ScheduleController) NextTakings(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	t, e := template.ParseFiles("templates/nextTakings.html")
-
 	query := r.URL.Query()
 	userID, e := strconv.Atoi(query.Get("user_id"))
 	if e != nil {
@@ -146,10 +137,8 @@ func (c ScheduleController) NextTakings(w http.ResponseWriter, r *http.Request) 
 		http.Error(w, "неверный user_id", http.StatusBadRequest)
 		return
 	}
-
-	data := struct {
-		NextTakings []string
-	}{nextTakings}
-	fmt.Println(data)
-	t.ExecuteTemplate(w, "nextTakings", data)
+	response := map[string]interface{}{
+		"next_takings": nextTakings,
+	}
+	json.NewEncoder(w).Encode(response)
 }

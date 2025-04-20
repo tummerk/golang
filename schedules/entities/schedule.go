@@ -38,3 +38,11 @@ func (schedule Schedule) ScheduleOnDay() []int { //создание массив
 
 	return takingMedications
 }
+
+func (schedule Schedule) ScheduleOnDayString() []string {
+	takings := make([]string, 0)
+	for _, v := range schedule.ScheduleOnDay() {
+		takings = append(takings, utils.MinuteToTime(v))
+	}
+	return takings
+}

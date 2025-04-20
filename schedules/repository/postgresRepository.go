@@ -42,6 +42,7 @@ func (r *PostgresRepository) GetUserSchedule(userID, scheduleID int) (Rows, erro
 	if e != nil {
 		log.Fatal(e)
 	}
+	row.Next()
 	return row, nil
 }
 

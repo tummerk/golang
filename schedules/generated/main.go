@@ -11,15 +11,16 @@
 package main
 
 import (
-	schedules "github.com/GIT_USER_ID/GIT_REPO_ID/api"
 	"log"
 	"net/http"
+
+	openapi "github.com/GIT_USER_ID/GIT_REPO_ID/go"
 )
 
 func main() {
 	log.Printf("Server started")
 
-	router := schedules.NewRouter()
+	router := openapi.NewRouter()
 
-	log.Fatal(http.ListenAndServe(":5252", router))
+	log.Fatal(http.ListenAndServe(":8080", router))
 }

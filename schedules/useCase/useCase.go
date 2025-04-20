@@ -3,9 +3,9 @@ package useCase
 import (
 	"first_project/config"
 	"first_project/entities"
+	"first_project/openapi"
 	"first_project/repository"
 	"first_project/utils"
-	"fmt"
 	"log"
 	"time"
 )
@@ -70,10 +70,10 @@ func (uc *ScheduleUC) GetUserSchedule(userID, scheduleID int) (entities.Schedule
 	return schedule, nil, isRelevant
 }
 
-func (uc *ScheduleUC) NextTakings(userID int) ([]string, error) {
+func (uc *ScheduleUC) NextTakings(userID int) ([]openapi.Taking, error) {
 	schedules, e, _ := uc.GetUserSchedules(userID)
 
-	var nextTakings []string
+	var nextTakings []openapi.Taking
 
 	if e != nil {
 		return nextTakings, e
@@ -86,8 +86,11 @@ func (uc *ScheduleUC) NextTakings(userID int) ([]string, error) {
 			case minute < minuteFromStartDay:
 				continue
 			case minute-minuteFromStartDay < config.TIME_NEXT_TAKINGS:
-				take := fmt.Sprintf("%s %s", utils.MinuteToTime(minute), schedule.MedicamentName)
-				nextTakings = append(nextTakings, take)
+				taking := openapi.Taking{
+					Name: schedule.MedicamentName,
+					Time: utils.MinuteToTime(minute),
+				}
+				nextTakings = append(nextTakings, taking)
 			default:
 				break
 			}

@@ -6,7 +6,7 @@ generate:
 	$(GENERATOR) generate \
 		-i $(SPEC) \
 		-g go-server \
-		-o $(OUT_DIR) \
+		-o generated
 		--additional-properties=packageName=schedules,serverPort=5252
 
 clean:

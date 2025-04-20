@@ -7,9 +7,9 @@ COPY go.mod .
 
 ENV CGO_ENABLED=0
 
-RUN go build -o schedules .
+RUN go build -o openapi .
 
 FROM scratch AS runtime
-COPY --from=build /go/src/schedules ./
+COPY --from=build /go/src/openapi ./
 EXPOSE 8080/tcp
-ENTRYPOINT ["./schedules"]
+ENTRYPOINT ["./openapi"]

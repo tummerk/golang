@@ -1,4 +1,4 @@
-# Go API Server for schedules
+# Go API Server for openapi
 
 API для работы с расписаниями
 
@@ -12,7 +12,7 @@ To see how to make this your own, look here:
 [README](https://openapi-generator.tech)
 
 - API version: 1.0.0
-- Build date: 2025-04-19T01:36:23.952750500+02:00[Europe/Kaliningrad]
+- Build date: 2025-04-20T20:33:32.676937100+02:00[Europe/Kaliningrad]
 - Generator version: 7.12.0
 
 
@@ -23,14 +23,14 @@ To run the server, follow these simple steps:
 go run main.go
 ```
 
-The server will be available on `http://localhost:5252`.
+The server will be available on `http://localhost:8080`.
 
 To run the server in a docker container
 ```
-docker build --network=host -t schedules .
+docker build --network=host -t openapi .
 ```
 
 Once image is built use
 ```
-docker run --rm -it schedules
+docker run --rm -it openapi
 ```

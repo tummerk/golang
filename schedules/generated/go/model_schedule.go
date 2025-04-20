@@ -8,12 +8,12 @@
  * API version: 1.0.0
  */
 
-package api
+package openapi
 
 
 
 
-type ScheduleJSON struct {
+type Schedule struct {
 
 	MedicamentName string `json:"medicamentName"`
 
@@ -21,7 +21,7 @@ type ScheduleJSON struct {
 }
 
 // AssertScheduleRequired checks if the required fields are not zero-ed
-func AssertScheduleRequired(obj ScheduleJSON) error {
+func AssertScheduleRequired(obj Schedule) error {
 	elements := map[string]interface{}{
 		"medicamentName": obj.MedicamentName,
 	}
@@ -35,6 +35,6 @@ func AssertScheduleRequired(obj ScheduleJSON) error {
 }
 
 // AssertScheduleConstraints checks if the values respects the defined constraints
-func AssertScheduleConstraints(obj ScheduleJSON) error {
+func AssertScheduleConstraints(obj Schedule) error {
 	return nil
 }
