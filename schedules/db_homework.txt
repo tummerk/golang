@@ -3,50 +3,86 @@ CREATE TABLE developers (
                             id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
                             name TEXT,
                             department TEXT,
-                            geolocation POINT,
+                            geolocation geography,
                             last_known_ip INET,
                             is_available BOOLEAN
 );
 
 _________________________3
-4921db67-8846-4de8-9345-c7405cfd71b7,James Smith,backend,"(-73.9857,40.7484)",192.168.1.10,true
-46c82f4e-70ab-4594-84bc-502119c88cec,Mary Johnson,frontend,"(-118.2437,34.0522)",10.0.0.5,false
-09679d63-1db7-4b4a-b6b7-b87ae5aa1c60,John Williams,ios,"(34.0522,-118.2437)",172.16.0.10,true
-3945a708-35f1-47b4-9626-70111a6d6991,Patricia Brown,android,"(151.2093,-33.8688)",192.168.0.15,false
-7b6abf55-737f-4d3b-8c20-26564ac1b0cb,Robert Jones,backend,"(2.3522,48.8566)",10.10.10.20,true
-016e1a13-8372-462c-b826-8d7f70965af1,James Johnson,frontend,"(-74.006,40.7128)",192.168.1.25,false
-01b154c4-690d-4dc9-a6e1-0615cde75341,Mary Williams,ios,"(13.405,52.52)",172.16.1.30,true
-944c072e-d383-4bb5-b27a-f0cb1d03c1b7,John Brown,android,"(-0.1278,51.5074)",10.0.1.35,false
-597bfb61-f46f-45da-b65c-477b56086828,Patricia Smith,backend,"(-87.6298,41.8781)",192.168.2.40,true
-329980e6-8ff6-44cf-8672-dab988cca189,Robert Williams,frontend,"(116.4074,39.9042)",172.16.2.45,false
-96c7fb3a-7d73-4079-8071-170339e7b7ca,James Brown,ios,"(121.4737,31.2304)",10.10.2.50,true
-301ea8ee-a11a-4a4c-8f32-975910c03eef,Mary Smith,android,"(-3.7038,40.4168)",192.168.3.55,false
-0525668f-bdfa-4b11-bdb2-205dc55224a9,John Johnson,backend,"(-77.0369,38.8951)",172.16.3.60,true
-7b57efb9-7b93-4f2e-be8c-c54ff7aea581,Patricia Williams,frontend,"(139.6917,35.6895)",10.0.3.65,false
-44573dcd-4458-4931-ab5c-8266fac72416,Robert Brown,ios,"(103.8198,1.3521)",192.168.4.70,true
-8f6a6188-6b07-453b-965c-78d6fe6872d8,James Jones,android,"(-122.4194,37.7749)",172.16.4.75,false
-6a9ab462-f285-44c2-84d3-c8d8d569a191,Mary Smith,backend,"(-71.0589,42.3601)",10.10.4.80,true
-a98d58e5-0c62-4135-9e50-435c37ff819e,John Johnson,frontend,"(144.9631,-37.8136)",192.168.5.85,false
-36e1a2a7-54b9-4f95-8c33-2bbae4ec3d11,Patricia Williams,ios,"(-115.1728,36.1146)",172.16.5.90,true
-1a9e53e8-b2f3-4ee9-84c9-e9e532b937f7,Robert Brown,android,"(77.209,28.6139)",10.0.5.95,false
+4f0e75ff-c6f8-47e8-979e-03b8464d630a,Robert Brown,android,0101000020E61000004C378941604D5340B003E78C289D3C40,10.0.5.95,false
+c1502373-438f-4acb-b43b-2277238625d1,Robert Brown,ios,0101000020E6100000B1506B9A77F45940E0BE0E9C33A2F53F,192.168.4.70,true
+fdd90ed2-2c85-4b33-a955-e0f9d558d5fc,Patricia Williams,frontend,0101000020E610000095D4096822766140C74B378941D84140,10.0.3.65,false
+c68116d9-e872-4ee4-8cf9-9f1c41063df1,James Brown,ios,0101000020E61000005F07CE19515E5E4097FF907EFB3A3F40,10.10.2.50,true
+3c95a7b4-19be-4daf-874b-95a4691c481f,Robert Williams,frontend,0101000020E6100000FC1873D7121A5D4088855AD3BCF34340,172.16.2.45,false
+f7b9851d-bdfc-478e-ae5a-35c5d32fb34e,John Brown,android,0101000020E6100000EBE2361AC05BC0BFC5FEB27BF2C04940,10.0.1.35,false
+00d279b4-b153-49d6-9a46-c1a1fe3a1d53,Mary Smith,android,0101000020E6100000FE65F7E461A10DC0857CD0B359354440,192.168.3.55,false
+3abaf888-8159-4495-80d0-4cb2f37ff79d,Patricia Smith,backend,0101000020E610000055C1A8A44EE855C00E4FAF9465F04440,192.168.2.40,true
+7532d0d5-089b-4e57-b755-682721111ad5,Mary Smith,backend,0101000020E6100000006F8104C5C351C012A5BDC1172E4540,10.10.4.80,true
+74bb901b-a2ff-4183-b5a5-8ba7adc6ea84,James Smith,backend,0101000020E6100000B3EA73B5157F52C0C7293A92CB5F4440,192.168.1.10,true
+c6919f74-c8aa-44b6-a22a-f9a78fc5d0f8,James Johnson,frontend,0101000020E6100000AAF1D24D628052C05E4BC8073D5B4440,192.168.1.25,false
+fca3373f-94e1-42bf-b5a8-0d957bff1e21,John Johnson,backend,0101000020E61000003C4ED1915C4253C0265305A392724340,172.16.3.60,true
+0fec162a-7193-4c30-8a19-2793d5bf693c,James Jones,android,0101000020E610000050FC1873D79A5EC0D0D556EC2FE34240,172.16.4.75,false
+7756bd5d-9f59-44b5-9fb3-215da678b699,Patricia Williams,ios,0101000020E6100000EC2FBB270FCB5CC0910F7A36AB0E4240,172.16.5.90,true
+8e7d70ff-f1df-4a81-b6c3-bcb895b419d6,Mary Johnson,frontend,0101000020E61000004182E2C7988F5DC0F46C567DAE064140,10.0.0.5,false
 
+ссылка на скрипт для генерации -
 _________________________4
-EXPLAIN SELECT * FROM developers WHERE name LIKE 'James%';
+1)EXPLAIN SELECT * FROM developers WHERE name LIKE 'James%';
 
-Seq Scan on developers  (cost=0.00..16.50 rows=3 width=129)
+Seq Scan on developers  (cost=0.00..16.50 rows=1 width=145)
   Filter: (name ~~ 'James%'::text)
 
-EXPLAIN SELECT * FROM developers WHERE department = 'backend';
+2)EXPLAIN SELECT * FROM developers WHERE department = 'backend';
 
-Seq Scan on developers  (cost=0.00..16.50 rows=3 width=129)
+Seq Scan on developers  (cost=0.00..16.50 rows=1 width=145)
   Filter: (department = 'backend'::text)
 
-EXPLAIN SELECT * FROM developers WHERE last_known_ip = '192.168.1.10';
+3)EXPLAIN SELECT * FROM developers WHERE last_known_ip = '192.168.1.10';
 
 Seq Scan on developers  (cost=0.00..16.50 rows=3 width=129)
   Filter: (last_known_ip = '192.168.1.10'::inet)
 
-EXPLAIN SELECT * FROM developers WHERE is_available = TRUE;
+4)EXPLAIN SELECT * FROM developers WHERE is_available = TRUE;
 
-Seq Scan on developers  (cost=0.00..15.20 rows=260 width=129)
+Seq Scan on developers  (cost=0.00..15.20 rows=10 width=145)
   Filter: is_available
+
+5)EXPLAIN SELECT * FROM developers WHERE
+              ST_DWithin(
+                      geolocation,
+                      ST_GeogFromText('SRID=4326;POINT(20.5111 54.7065)'),
+                      10000
+              );
+
+Seq Scan on developers  (cost=0.00..5889.70 rows=1 width=145)
+"  Filter: st_dwithin(geolocation, '0101000020E610000050FC1873D7823440DF4F8D976E5A4B40'::geography, '10000'::double precision, true)"
+
+
+_________________________5
+
+1)CREATE INDEX idx_developers_name ON developers (name);
+
+EXPLAIN SELECT * FROM developers WHERE name LIKE 'James%';
+Seq Scan on developers  (cost=0.00..1.26 rows=1 width=145)
+
+2)CREATE INDEX idx_developers_department ON developers (department);
+
+EXPLAIN SELECT * FROM developers WHERE department = 'backend';
+Seq Scan on developers  (cost=0.00..1.25 rows=1 width=145)
+
+3)CREATE INDEX idx_developers_ip ON developers USING GiST (last_known_ip);
+
+EXPLAIN SELECT * FROM developers WHERE last_known_ip = '192.168.1.10';
+Seq Scan on developers  (cost=0.00..1.25 rows=1 width=145)
+
+4)CREATE INDEX idx_developers_available ON developers (is_available)
+
+EXPLAIN SELECT * FROM developers WHERE is_available = TRUE;
+Seq Scan on developers  (cost=0.00..1.20 rows=10 width=145)
+
+5)CREATE INDEX idx_developers_geolocation ON developers USING gist (geolocation);
+
+Index Scan using idx_developers_geolocation on developers  (cost=0.26..20.78 rows=1 width=145)
+"  Index Cond: (geolocation && _st_expand('0101000020E610000050FC1873D7823440DF4F8D976E5A4B40'::geography, '10000'::double precision))"
+"  Filter: st_dwithin(geolocation, '0101000020E610000050FC1873D7823440DF4F8D976E5A4B40'::geography, '10000'::double precision, true)"
+
