@@ -25,7 +25,7 @@ fca3373f-94e1-42bf-b5a8-0d957bff1e21,John Johnson,backend,0101000020E61000003C4E
 7756bd5d-9f59-44b5-9fb3-215da678b699,Patricia Williams,ios,0101000020E6100000EC2FBB270FCB5CC0910F7A36AB0E4240,172.16.5.90,true
 8e7d70ff-f1df-4a81-b6c3-bcb895b419d6,Mary Johnson,frontend,0101000020E61000004182E2C7988F5DC0F46C567DAE064140,10.0.0.5,false
 
-ссылка на скрипт для генерации -
+ссылка на скрипт для генерации - https://github.com/tummerk/golang/blob/main/schedules/script.sql
 _________________________4
 1)EXPLAIN SELECT * FROM developers WHERE name LIKE 'James%';
 
