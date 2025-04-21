@@ -1,11 +1,12 @@
 package useCase
 
 import (
-	"first_project/config"
-	"first_project/entities"
-	"first_project/openapi"
-	"first_project/repository"
-	"first_project/utils"
+	"github.com/tummerk/golang/schedules/config"
+	"github.com/tummerk/golang/schedules/entities"
+	openapi "github.com/tummerk/golang/schedules/generatedOpenapi/go"
+	"github.com/tummerk/golang/schedules/repository"
+	"github.com/tummerk/golang/schedules/utils"
+
 	"log"
 	"time"
 )
@@ -15,6 +16,7 @@ type ScheduleUC struct {
 }
 
 func NewScheduleUC(repository repository.ScheduleRepository) *ScheduleUC {
+
 	return &ScheduleUC{Repository: repository}
 }
 

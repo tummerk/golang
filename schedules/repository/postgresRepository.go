@@ -2,9 +2,9 @@ package repository
 
 import (
 	"database/sql"
-	"first_project/config"
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
+	"github.com/tummerk/golang/schedules/config"
 	"log"
 	"time"
 )

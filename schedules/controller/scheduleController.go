@@ -2,10 +2,10 @@ package controller
 
 import (
 	"encoding/json"
-	"first_project/openapi"
-	"first_project/repository"
-	"first_project/useCase"
 	"fmt"
+	openapi "github.com/tummerk/golang/schedules/generatedOpenapi/go"
+	"github.com/tummerk/golang/schedules/repository"
+	"github.com/tummerk/golang/schedules/useCase"
 	"html/template"
 	"net/http"
 	"strconv"
@@ -46,16 +46,16 @@ func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Requ
 		http.Error(w, "Такому пользователю лекарства не назначались!", http.StatusBadRequest)
 		return
 	}
-	currentSchedulesJson := []openapi.ScheduleJSON{}
+	currentSchedulesJson := []openapi.Schedule{}
 	for _, schedule := range currentSchedules {
 		takings := schedule.ScheduleOnDayString()
-		currentSchedulesJson = append(currentSchedulesJson, openapi.ScheduleJSON{schedule.MedicamentName, takings})
+		currentSchedulesJson = append(currentSchedulesJson, openapi.Schedule{schedule.MedicamentName, takings})
 	}
 
-	pastSchedulesJson := []openapi.ScheduleJSON{}
+	pastSchedulesJson := []openapi.Schedule{}
 	for _, schedule := range pastSchedules {
 		takings := schedule.ScheduleOnDayString()
-		currentSchedulesJson = append(currentSchedulesJson, openapi.ScheduleJSON{schedule.MedicamentName, takings})
+		currentSchedulesJson = append(currentSchedulesJson, openapi.Schedule{schedule.MedicamentName, takings})
 	}
 
 	response := map[string]interface{}{
@@ -107,7 +107,7 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 		schedule, e, isRelevant := c.UC.GetUserSchedule(userID, scheduleID)
 
 		takings := schedule.ScheduleOnDayString()
-		var scheduleJSON = openapi.ScheduleJSON{schedule.MedicamentName, takings}
+		var scheduleJSON = openapi.Schedule{schedule.MedicamentName, takings}
 
 		response := map[string]interface{}{
 			"scheduleJSON": scheduleJSON,

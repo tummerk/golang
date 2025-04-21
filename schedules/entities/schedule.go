@@ -1,7 +1,7 @@
 package entities
 
 import (
-	"first_project/utils"
+	"github.com/tummerk/golang/schedules/utils"
 	"time"
 )
 

@@ -1,0 +1,52 @@
+_________________________2
+CREATE TABLE developers (
+                            id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+                            name TEXT,
+                            department TEXT,
+                            geolocation POINT,
+                            last_known_ip INET,
+                            is_available BOOLEAN
+);
+
+_________________________3
+4921db67-8846-4de8-9345-c7405cfd71b7,James Smith,backend,"(-73.9857,40.7484)",192.168.1.10,true
+46c82f4e-70ab-4594-84bc-502119c88cec,Mary Johnson,frontend,"(-118.2437,34.0522)",10.0.0.5,false
+09679d63-1db7-4b4a-b6b7-b87ae5aa1c60,John Williams,ios,"(34.0522,-118.2437)",172.16.0.10,true
+3945a708-35f1-47b4-9626-70111a6d6991,Patricia Brown,android,"(151.2093,-33.8688)",192.168.0.15,false
+7b6abf55-737f-4d3b-8c20-26564ac1b0cb,Robert Jones,backend,"(2.3522,48.8566)",10.10.10.20,true
+016e1a13-8372-462c-b826-8d7f70965af1,James Johnson,frontend,"(-74.006,40.7128)",192.168.1.25,false
+01b154c4-690d-4dc9-a6e1-0615cde75341,Mary Williams,ios,"(13.405,52.52)",172.16.1.30,true
+944c072e-d383-4bb5-b27a-f0cb1d03c1b7,John Brown,android,"(-0.1278,51.5074)",10.0.1.35,false
+597bfb61-f46f-45da-b65c-477b56086828,Patricia Smith,backend,"(-87.6298,41.8781)",192.168.2.40,true
+329980e6-8ff6-44cf-8672-dab988cca189,Robert Williams,frontend,"(116.4074,39.9042)",172.16.2.45,false
+96c7fb3a-7d73-4079-8071-170339e7b7ca,James Brown,ios,"(121.4737,31.2304)",10.10.2.50,true
+301ea8ee-a11a-4a4c-8f32-975910c03eef,Mary Smith,android,"(-3.7038,40.4168)",192.168.3.55,false
+0525668f-bdfa-4b11-bdb2-205dc55224a9,John Johnson,backend,"(-77.0369,38.8951)",172.16.3.60,true
+7b57efb9-7b93-4f2e-be8c-c54ff7aea581,Patricia Williams,frontend,"(139.6917,35.6895)",10.0.3.65,false
+44573dcd-4458-4931-ab5c-8266fac72416,Robert Brown,ios,"(103.8198,1.3521)",192.168.4.70,true
+8f6a6188-6b07-453b-965c-78d6fe6872d8,James Jones,android,"(-122.4194,37.7749)",172.16.4.75,false
+6a9ab462-f285-44c2-84d3-c8d8d569a191,Mary Smith,backend,"(-71.0589,42.3601)",10.10.4.80,true
+a98d58e5-0c62-4135-9e50-435c37ff819e,John Johnson,frontend,"(144.9631,-37.8136)",192.168.5.85,false
+36e1a2a7-54b9-4f95-8c33-2bbae4ec3d11,Patricia Williams,ios,"(-115.1728,36.1146)",172.16.5.90,true
+1a9e53e8-b2f3-4ee9-84c9-e9e532b937f7,Robert Brown,android,"(77.209,28.6139)",10.0.5.95,false
+
+_________________________4
+EXPLAIN SELECT * FROM developers WHERE name LIKE 'James%';
+
+Seq Scan on developers  (cost=0.00..16.50 rows=3 width=129)
+  Filter: (name ~~ 'James%'::text)
+
+EXPLAIN SELECT * FROM developers WHERE department = 'backend';
+
+Seq Scan on developers  (cost=0.00..16.50 rows=3 width=129)
+  Filter: (department = 'backend'::text)
+
+EXPLAIN SELECT * FROM developers WHERE last_known_ip = '192.168.1.10';
+
+Seq Scan on developers  (cost=0.00..16.50 rows=3 width=129)
+  Filter: (last_known_ip = '192.168.1.10'::inet)
+
+EXPLAIN SELECT * FROM developers WHERE is_available = TRUE;
+
+Seq Scan on developers  (cost=0.00..15.20 rows=260 width=129)
+  Filter: is_available
