@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/tummerk/golang/schedules/entities"
 	openapi "github.com/tummerk/golang/schedules/generatedOpenapi/go"
 	"github.com/tummerk/golang/schedules/repository"
 	"github.com/tummerk/golang/schedules/useCase"
@@ -11,12 +12,19 @@ import (
 	"strconv"
 )
 
+type scheduleUC interface {
+	Create(medicamentName string, userId, receptionsPerDay, duration int) (int, error)
+	GetUserSchedules(userID int) ([]entities.Schedule, error, []entities.Schedule)
+	GetUserSchedule(userID, scheduleID int) (entities.Schedule, error, bool)
+	NextTakings(userID int) ([]openapi.Taking, error)
+}
+
 type ScheduleController struct {
-	UC useCase.ScheduleUC
+	UC scheduleUC
 }
 
 func NewScheduleController(repo repository.ScheduleRepository) *ScheduleController {
-	return &ScheduleController{*useCase.NewScheduleUC(repo)}
+	return &ScheduleController{useCase.NewScheduleUC(repo)}
 }
 
 func (c ScheduleController) Create(w http.ResponseWriter, r *http.Request) {

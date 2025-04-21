@@ -17,7 +17,7 @@ func main() {
 
 	repo := repository.PostgresRepository{}
 	useCase := useCase.ScheduleUC{Repository: &repo}
-	cont := controller.ScheduleController{UC: useCase}
+	cont := controller.ScheduleController{UC: &useCase}
 
 	appRest := restApp.NewAppRest(&cont)
 	appGrpc := grpcApp.NewApp("12345", useCase)
