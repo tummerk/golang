@@ -2,27 +2,33 @@ package restApp
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/tummerk/golang/schedules/controller"
 	openapi "github.com/tummerk/golang/schedules/generatedOpenapi/go"
 	"net/http"
 )
 
-type appRest struct {
-	router     *mux.Router
-	controller controller.ScheduleController
+type Controller interface {
+	Create(w http.ResponseWriter, r *http.Request)
+	GetUserSchedules(w http.ResponseWriter, r *http.Request)
+	GetUserSchedule(w http.ResponseWriter, r *http.Request)
+	NextTakings(w http.ResponseWriter, r *http.Request)
 }
 
-func NewAppRest(controller *controller.ScheduleController) *appRest {
+type appRest struct {
+	router     *mux.Router
+	controller *Controller
+}
+
+func NewAppRest(c Controller) *appRest {
 	router := openapi.NewRouter()
 
-	router.HandleFunc("/schedule/create", controller.Create)
-	router.HandleFunc("/schedule", controller.GetUserSchedule)
-	router.HandleFunc("/schedules", controller.GetUserSchedules)
-	router.HandleFunc("/next_takings", controller.NextTakings)
+	router.HandleFunc("/schedule/create", c.Create)
+	router.HandleFunc("/schedule", c.GetUserSchedule)
+	router.HandleFunc("/schedules", c.GetUserSchedules)
+	router.HandleFunc("/next_takings", c.NextTakings)
 
 	app := appRest{
 		router:     router,
-		controller: *controller,
+		controller: &c,
 	}
 	return &app
 }

@@ -4,7 +4,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/lib/pq"
-	"github.com/tummerk/golang/schedules/app/REST"
+	restApp "github.com/tummerk/golang/schedules/app/REST"
 	grpcApp "github.com/tummerk/golang/schedules/app/gRPC"
 	"github.com/tummerk/golang/schedules/controller"
 	"github.com/tummerk/golang/schedules/repository"
