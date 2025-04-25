@@ -1,6 +1,5 @@
+# Логи
 *.log
 
-.idea
-
-go.mod
-go.sum
+# JetBrains IDE
+.idea/
