@@ -9,7 +9,7 @@ import (
 
 // округление  вверх
 func RoundUp(num, multiple int) int {
-	if num%15 == 0 {
+	if num%multiple == 0 {
 		return num
 	}
 	return num + (multiple - num%multiple)

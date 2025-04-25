@@ -27,6 +27,9 @@ type Logger interface {
 }
 
 func (schedule Schedule) ScheduleOnDay(ctx context.Context, logger Logger) []int { //создание массива состоящего из времени приемов (в мин от начала дня)
+	if schedule.ReceptionsPerDay > 15 || schedule.ReceptionsPerDay < 1 {
+		return []int{}
+	}
 	traceID := slog.Any("traceID", ctx.Value("traceID"))
 	var takingsMedications []int
 	minuteFromStartDay := 480
