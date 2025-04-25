@@ -8,9 +8,16 @@ import (
 	"log"
 )
 
+type Logger interface {
+	Info(msg string, keysAndValues ...interface{})
+	Error(msg string, keysAndValues ...interface{})
+	Debug(msg string, keysAndValues ...interface{})
+}
+
 type serverAPI struct {
 	grpcGen.UnimplementedScheduleServiceServer
-	UC useCase.ScheduleUC
+	UC     useCase.ScheduleUC
+	logger Logger
 }
 
 func Register(gRPC *grpc.Server, UC useCase.ScheduleUC) {
@@ -18,7 +25,7 @@ func Register(gRPC *grpc.Server, UC useCase.ScheduleUC) {
 }
 
 func (s *serverAPI) GetSchedule(ctx context.Context, req *grpcGen.GetScheduleRequest) (*grpcGen.Schedule, error) {
-	schedule, e, isRelevant := s.UC.GetUserSchedule(int(req.GetUserID()), int(req.GetScheduleID()))
+	schedule, e, isRelevant := s.UC.GetUserSchedule(ctx, int(req.GetUserID()), int(req.GetScheduleID()))
 	if e != nil {
 		log.Print(e)
 	}
@@ -26,12 +33,12 @@ func (s *serverAPI) GetSchedule(ctx context.Context, req *grpcGen.GetScheduleReq
 	return &grpcGen.Schedule{
 		MedicamentName: schedule.MedicamentName,
 		IsActual:       isRelevant,
-		Takings:        schedule.ScheduleOnDayString(),
+		Takings:        schedule.ScheduleOnDayString(ctx, s.logger),
 	}, nil
 }
 
 func (s *serverAPI) GetSchedules(ctx context.Context, req *grpcGen.UserID) (*grpcGen.Schedules, error) {
-	currentSchedules, e, _ := s.UC.GetUserSchedules(int(req.GetUserID()))
+	currentSchedules, e, _ := s.UC.GetUserSchedules(ctx, int(req.GetUserID()))
 	if e != nil {
 		log.Print(e)
 	}
@@ -40,7 +47,7 @@ func (s *serverAPI) GetSchedules(ctx context.Context, req *grpcGen.UserID) (*grp
 		schedules = append(schedules, &grpcGen.Schedule{
 			MedicamentName: schedule.MedicamentName,
 			IsActual:       true,
-			Takings:        schedule.ScheduleOnDayString(),
+			Takings:        schedule.ScheduleOnDayString(ctx, s.logger),
 		})
 	}
 
@@ -59,7 +66,7 @@ func (s *serverAPI) CreateSchedule(ctx context.Context, req *grpcGen.CreateSched
 		return &grpcGen.ScheduleID{ScheduleID: -1}, nil
 	}
 
-	scheduleID, e := s.UC.Create(medicamentName, userID, receptionsPerDay, duration)
+	scheduleID, e := s.UC.Create(ctx, medicamentName, userID, receptionsPerDay, duration)
 
 	if e != nil {
 		log.Print(e)
@@ -68,7 +75,7 @@ func (s *serverAPI) CreateSchedule(ctx context.Context, req *grpcGen.CreateSched
 }
 
 func (s *serverAPI) NextTakings(ctx context.Context, req *grpcGen.UserID) (*grpcGen.Takings, error) {
-	takings, e := s.UC.NextTakings(int(req.UserID))
+	takings, e := s.UC.NextTakings(ctx, int(req.UserID))
 	if e != nil {
 		log.Print(e)
 	}

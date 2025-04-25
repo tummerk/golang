@@ -1,43 +1,46 @@
 package controller
 
 import (
+	"context"
 	"encoding/json"
-	"fmt"
-	"github.com/tummerk/golang/schedules/entities"
+	"github.com/tummerk/golang/schedules/domain/entities"
 	openapi "github.com/tummerk/golang/schedules/generatedOpenapi/go"
-	"github.com/tummerk/golang/schedules/repository"
-	"github.com/tummerk/golang/schedules/useCase"
 	"html/template"
 	"net/http"
 	"strconv"
 )
 
 type scheduleUC interface {
-	Create(medicamentName string, userId, receptionsPerDay, duration int) (int, error)
-	GetUserSchedules(userID int) ([]entities.Schedule, error, []entities.Schedule)
-	GetUserSchedule(userID, scheduleID int) (entities.Schedule, error, bool)
-	NextTakings(userID int) ([]openapi.Taking, error)
+	Create(ctx context.Context, medicamentName string, userId, receptionsPerDay, duration int) (int, error)
+	GetUserSchedules(ctx context.Context, userID int) ([]entities.Schedule, error, []entities.Schedule)
+	GetUserSchedule(ctx context.Context, userID, scheduleID int) (entities.Schedule, error, bool)
+	NextTakings(ctx context.Context, userID int) ([]openapi.Taking, error)
+}
+
+type Logger interface {
+	Error(msg string, args ...interface{})
+	Debug(msg string, args ...interface{})
 }
 
 type ScheduleController struct {
-	UC scheduleUC
-}
-
-func NewScheduleController(repo repository.ScheduleRepository) *ScheduleController {
-	return &ScheduleController{useCase.NewScheduleUC(repo)}
+	UC     scheduleUC
+	Logger Logger
 }
 
 func (c ScheduleController) Create(w http.ResponseWriter, r *http.Request) {
+
 	t, e := template.ParseFiles("templates/scheduleCreate.html")
 	if e != nil {
-		fmt.Println(e)
+		c.Logger.Error(e.Error())
 	}
 	t.ExecuteTemplate(w, "scheduleCreate", nil)
+
 }
 
 func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
+
 		return
 	}
 
@@ -48,7 +51,7 @@ func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	currentSchedules, e, pastSchedules := c.UC.GetUserSchedules(userID)
+	currentSchedules, e, pastSchedules := c.UC.GetUserSchedules(r.Context(), userID)
 
 	if e != nil || len(currentSchedules)+len(pastSchedules) == 0 {
 		http.Error(w, "Такому пользователю лекарства не назначались!", http.StatusBadRequest)
@@ -56,13 +59,13 @@ func (c ScheduleController) GetUserSchedules(w http.ResponseWriter, r *http.Requ
 	}
 	currentSchedulesJson := []openapi.Schedule{}
 	for _, schedule := range currentSchedules {
-		takings := schedule.ScheduleOnDayString()
+		takings := schedule.ScheduleOnDayString(r.Context(), c.Logger)
 		currentSchedulesJson = append(currentSchedulesJson, openapi.Schedule{schedule.MedicamentName, takings})
 	}
 
 	pastSchedulesJson := []openapi.Schedule{}
 	for _, schedule := range pastSchedules {
-		takings := schedule.ScheduleOnDayString()
+		takings := schedule.ScheduleOnDayString(r.Context(), c.Logger)
 		currentSchedulesJson = append(currentSchedulesJson, openapi.Schedule{schedule.MedicamentName, takings})
 	}
 
@@ -94,12 +97,11 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 			http.Error(w, "вы указали не целое число в полях где это нужно", http.StatusBadRequest)
 			return
 		}
-		scheduleID, e := c.UC.Create(medicamentName, userID, receptionsPerDay, duration)
+		scheduleID, e := c.UC.Create(r.Context(), medicamentName, userID, receptionsPerDay, duration)
 
 		//возвращаем ID нового расписания
-		w.Write([]byte(strconv.Itoa(int(scheduleID))))
+		w.Write([]byte(strconv.Itoa(scheduleID)))
 	case r.Method == http.MethodGet: //поиск schedule по ID и user_id
-
 		query := r.URL.Query()
 		userID, e := strconv.Atoi(query.Get("user_id"))
 		if e != nil {
@@ -112,10 +114,10 @@ func (c ScheduleController) GetUserSchedule(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		schedule, e, isRelevant := c.UC.GetUserSchedule(userID, scheduleID)
+		schedule, e, isRelevant := c.UC.GetUserSchedule(r.Context(), userID, scheduleID)
 
-		takings := schedule.ScheduleOnDayString()
-		var scheduleJSON = openapi.Schedule{schedule.MedicamentName, takings}
+		takings := schedule.ScheduleOnDayString(r.Context(), c.Logger)
+		var scheduleJSON = openapi.Schedule{MedicamentName: schedule.MedicamentName, Takings: takings}
 
 		response := map[string]interface{}{
 			"scheduleJSON": scheduleJSON,
@@ -140,7 +142,7 @@ func (c ScheduleController) NextTakings(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	nextTakings, e := c.UC.NextTakings(userID)
+	nextTakings, e := c.UC.NextTakings(r.Context(), userID)
 	if e != nil {
 		http.Error(w, "неверный user_id", http.StatusBadRequest)
 		return

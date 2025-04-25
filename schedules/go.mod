@@ -4,10 +4,12 @@ go 1.23.7
 
 require (
 	github.com/golang-migrate/migrate/v4 v4.18.2
+	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/lib/pq v1.10.9
 	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.4
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
 
 require (

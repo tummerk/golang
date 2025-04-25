@@ -2,7 +2,6 @@ package repository
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/tummerk/golang/schedules/config"
 	"log"
@@ -32,7 +31,6 @@ func (r *PostgresRepository) GetUserSchedules(userID int) (Rows, error) {
 	if e != nil {
 		log.Fatal(e)
 	}
-	fmt.Println(rows)
 	return rows, e
 }
 

@@ -1,0 +1,6 @@
+*.log
+
+.idea
+
+go.mod
+go.sum
