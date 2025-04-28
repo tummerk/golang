@@ -2,6 +2,8 @@ package utils
 
 import (
 	"fmt"
+	"github.com/lestrrat-go/jwx/v2/jwa"
+	"github.com/lestrrat-go/jwx/v2/jwe"
 	"time"
 )
 
@@ -29,4 +31,18 @@ func MinuteFromStartDay(time time.Time) int {
 // перевод time.Time в дату
 func TimeToDate(t time.Time) string {
 	return t.Format("2006 January	02")
+}
+
+//маскировка
+
+func Encrypt(data string, key []byte) (string, error) {
+	encrypted, err := jwe.Encrypt(
+		[]byte(data),
+		jwe.WithKey(jwa.A256GCMKW, key),
+		jwe.WithContentEncryption(jwa.A256GCM),
+	)
+	if err != nil {
+		return "", err
+	}
+	return string(encrypted), nil
 }

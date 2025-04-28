@@ -58,7 +58,10 @@ func (app *appRest) Run(addr string) {
 func (app *appRest) MiddleWare(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
-		traceID := uuid.NewString()
+		traceID := r.Header.Get("X-Trace-Id")
+		if traceID == "" {
+			traceID = uuid.NewString()
+		}
 
 		ctx := context.WithValue(r.Context(), "traceID", traceID)
 		ctx = context.WithValue(ctx, "startTime", startTime)

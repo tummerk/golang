@@ -2,6 +2,8 @@ package logger
 
 import (
 	"context"
+	"github.com/tummerk/golang/schedules/config"
+	"github.com/tummerk/golang/schedules/utils"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log/slog"
 	"net/http"
@@ -26,6 +28,9 @@ func NewLogger(fileName string, level slog.Level) *slog.Logger {
 
 func RequestLog(r *http.Request) slog.Attr {
 	query := r.URL.Query()
+	userID := query.Get("user_id")
+	scheduleID := query.Get("schedule_id")
+	userID, _ = utils.Encrypt(userID, config.Key)
 	requestInfo := []slog.Attr{
 		slog.Any("traceID", r.Context().Value("traceID")),
 		slog.String("method", r.Method),
@@ -33,7 +38,10 @@ func RequestLog(r *http.Request) slog.Attr {
 		slog.String("host", r.Host),
 		slog.String("user_agent", r.UserAgent()),
 		slog.String("ip", r.RemoteAddr),
-		slog.Any("query_param", query),
+		slog.String("userID", userID),
+	}
+	if scheduleID != "" {
+		requestInfo = append(requestInfo, slog.String("scheduleID", scheduleID))
 	}
 	return slog.Any("request_info", requestInfo)
 }
