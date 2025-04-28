@@ -1,6 +1,6 @@
 _________________________2
 CREATE TABLE developers (
-                            id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+                            scheduleID uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
                             name TEXT,
                             department TEXT,
                             geolocation geography,

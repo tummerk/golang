@@ -4,20 +4,32 @@ import (
 	"database/sql"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/tummerk/golang/schedules/config"
-	"log"
+	"github.com/tummerk/golang/schedules/utils"
+	"log/slog"
+	"strconv"
 	"time"
 )
 
+type Logger interface {
+	Info(msg string, args ...interface{})
+	Debug(msg string, args ...interface{})
+	Error(msg string, args ...interface{})
+}
+
 type PostgresRepository struct {
-	DB *sql.DB
+	DB     *sql.DB
+	logger Logger
 }
 
 func (r *PostgresRepository) Connect() error {
 	var e error
 	r.DB, e = sql.Open("postgres", config.ConnStr)
 	if e != nil {
-		log.Fatal(e)
+		r.logger.Error("Error connecting to Postgres database",
+			slog.String("error", e.Error()))
+
 	}
+	r.logger.Info("Successfully connected to Postgres database")
 	return nil
 }
 
@@ -28,18 +40,29 @@ func (r *PostgresRepository) Close() {
 func (r *PostgresRepository) GetUserSchedules(userID int) (Rows, error) {
 	rows, e := r.DB.Query(`SELECT "id","medicament_name","receptions_per_day","date_start","date_end"
 							   FROM schedules WHERE user_id = $1`, userID)
+	userIdEncode, _ := utils.Encrypt(strconv.Itoa(userID), config.Key)
 	if e != nil {
-		log.Fatal(e)
+		r.logger.Error("Error getting user schedules",
+			slog.String("error", e.Error()),
+			slog.String("userID", userIdEncode))
 	}
+	r.logger.Info("Successfully got user schedules",
+		slog.String("userID", userIdEncode))
 	return rows, e
 }
 
 func (r *PostgresRepository) GetUserSchedule(userID, scheduleID int) (Rows, error) {
+	userIdEncode, _ := utils.Encrypt(strconv.Itoa(userID), config.Key)
 	row, e := r.DB.Query(`SELECT "id","medicament_name","receptions_per_day","date_start","date_end"
 							   FROM schedules WHERE user_id = $1 and id = $2`, userID, scheduleID)
 	if e != nil {
-		log.Fatal(e)
+		r.logger.Error("Error getting schedule", slog.String("error", e.Error()),
+			slog.String("userID", userIdEncode),
+			slog.Int("scheduleID", scheduleID))
 	}
+	r.logger.Info("Successfully got schedule",
+		slog.String("userID", userIdEncode),
+		slog.Int("scheduleID", scheduleID))
 	row.Next()
 	return row, nil
 }
@@ -60,14 +83,15 @@ func (r *PostgresRepository) NewUserSchedule(medicamentName string, userId, rece
 								 VALUES
 	($1, $2, $3, $4, $5)
 	RETURNING id`, medicamentName, userId, receptionsPerDay, dateStart, dateEnd)
-
 	if result.Err() != nil {
-		log.Fatal(result.Err())
+		r.logger.Error("error with creating user schedule",
+			slog.String("error", result.Err().Error()))
 	}
-
-	var id int
-	result.Scan(&id)
-	return id, nil
+	var scheduleID int
+	result.Scan(&scheduleID)
+	r.logger.Info("Successfully created user schedule",
+		slog.Int("scheduleId", scheduleID))
+	return scheduleID, nil
 }
 
 func (r *PostgresRepository) RunMigrations() error {
@@ -77,7 +101,10 @@ func (r *PostgresRepository) RunMigrations() error {
 	}
 	defer m.Close()
 	if e = m.Up(); e != nil && e != migrate.ErrNoChange {
+		r.logger.Error("Error running migrations",
+			slog.String("error", e.Error()))
 		return e
 	}
+	r.logger.Info("Successfully migrated migrations")
 	return nil
 }
