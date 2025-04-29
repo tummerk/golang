@@ -26,7 +26,7 @@ func NewLogger(fileName string, level slog.Level) *slog.Logger {
 	return logger
 }
 
-func RequestLog(r *http.Request) slog.Attr {
+func RequestLogRestapi(r *http.Request) slog.Attr {
 	query := r.URL.Query()
 	userID := query.Get("user_id")
 	scheduleID := query.Get("schedule_id")
@@ -46,7 +46,7 @@ func RequestLog(r *http.Request) slog.Attr {
 	return slog.Any("request_info", requestInfo)
 }
 
-func ResponseLog(ctx context.Context, w LoggingResponseWriter) slog.Attr {
+func ResponseLogRestapi(ctx context.Context, w LoggingResponseWriter) slog.Attr {
 	start := ctx.Value("startTime")
 	startTime := start.(time.Time)
 	responseInfo := []slog.Attr{

@@ -18,18 +18,18 @@ type Logger interface {
 
 type PostgresRepository struct {
 	DB     *sql.DB
-	logger Logger
+	Logger Logger
 }
 
 func (r *PostgresRepository) Connect() error {
 	var e error
 	r.DB, e = sql.Open("postgres", config.ConnStr)
 	if e != nil {
-		r.logger.Error("Error connecting to Postgres database",
+		r.Logger.Error("Error connecting to Postgres database",
 			slog.String("error", e.Error()))
 
 	}
-	r.logger.Info("Successfully connected to Postgres database")
+	r.Logger.Info("Successfully connected to Postgres database")
 	return nil
 }
 
@@ -42,11 +42,11 @@ func (r *PostgresRepository) GetUserSchedules(userID int) (Rows, error) {
 							   FROM schedules WHERE user_id = $1`, userID)
 	userIdEncode, _ := utils.Encrypt(strconv.Itoa(userID), config.Key)
 	if e != nil {
-		r.logger.Error("Error getting user schedules",
+		r.Logger.Error("Error getting user schedules",
 			slog.String("error", e.Error()),
 			slog.String("userID", userIdEncode))
 	}
-	r.logger.Info("Successfully got user schedules",
+	r.Logger.Info("Successfully got user schedules",
 		slog.String("userID", userIdEncode))
 	return rows, e
 }
@@ -56,11 +56,11 @@ func (r *PostgresRepository) GetUserSchedule(userID, scheduleID int) (Rows, erro
 	row, e := r.DB.Query(`SELECT "id","medicament_name","receptions_per_day","date_start","date_end"
 							   FROM schedules WHERE user_id = $1 and id = $2`, userID, scheduleID)
 	if e != nil {
-		r.logger.Error("Error getting schedule", slog.String("error", e.Error()),
+		r.Logger.Error("Error getting schedule", slog.String("error", e.Error()),
 			slog.String("userID", userIdEncode),
 			slog.Int("scheduleID", scheduleID))
 	}
-	r.logger.Info("Successfully got schedule",
+	r.Logger.Info("Successfully got schedule",
 		slog.String("userID", userIdEncode),
 		slog.Int("scheduleID", scheduleID))
 	row.Next()
@@ -84,12 +84,12 @@ func (r *PostgresRepository) NewUserSchedule(medicamentName string, userId, rece
 	($1, $2, $3, $4, $5)
 	RETURNING id`, medicamentName, userId, receptionsPerDay, dateStart, dateEnd)
 	if result.Err() != nil {
-		r.logger.Error("error with creating user schedule",
+		r.Logger.Error("error with creating user schedule",
 			slog.String("error", result.Err().Error()))
 	}
 	var scheduleID int
 	result.Scan(&scheduleID)
-	r.logger.Info("Successfully created user schedule",
+	r.Logger.Info("Successfully created user schedule",
 		slog.Int("scheduleId", scheduleID))
 	return scheduleID, nil
 }
@@ -101,10 +101,10 @@ func (r *PostgresRepository) RunMigrations() error {
 	}
 	defer m.Close()
 	if e = m.Up(); e != nil && e != migrate.ErrNoChange {
-		r.logger.Error("Error running migrations",
+		r.Logger.Error("Error running migrations",
 			slog.String("error", e.Error()))
 		return e
 	}
-	r.logger.Info("Successfully migrated migrations")
+	r.Logger.Info("Successfully migrated migrations")
 	return nil
 }

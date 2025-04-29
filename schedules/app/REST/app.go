@@ -69,7 +69,7 @@ func (app *appRest) MiddleWare(next http.Handler) http.Handler {
 		ctx = context.WithValue(ctx, "userAgent", r.UserAgent())
 		r = r.WithContext(ctx)
 
-		app.logger.Info("request", logger.RequestLog(r))
+		app.logger.Info("request", logger.RequestLogRestapi(r))
 
 		lw := logger.LoggingResponseWriter{
 			ResponseWriter: w,
@@ -77,6 +77,6 @@ func (app *appRest) MiddleWare(next http.Handler) http.Handler {
 			Size:           0,
 		}
 		next.ServeHTTP(&lw, r)
-		app.logger.Info("response", logger.ResponseLog(ctx, lw))
+		app.logger.Info("response", logger.ResponseLogRestapi(ctx, lw))
 	})
 }

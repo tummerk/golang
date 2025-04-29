@@ -18,13 +18,13 @@ func main() {
 	loggerSchedule := logger.NewLogger("schedule.log", slog.LevelDebug)
 	wg := sync.WaitGroup{}
 
-	repo := repository.PostgresRepository{}
+	repo := repository.PostgresRepository{DB: nil, Logger: loggerSchedule}
 	useCase := useCase.ScheduleUC{Repository: &repo, Logger: loggerSchedule}
 	//рест
 	cont := controller.ScheduleController{UC: &useCase, Logger: loggerSchedule}
 	appRest := restApp.NewAppRest(&cont, loggerSchedule)
 	//gRPC
-	appGrpc := grpcApp.NewApp("12345", useCase)
+	appGrpc := grpcApp.NewApp("12345", useCase, loggerSchedule)
 
 	repo.Connect()
 
