@@ -1,0 +1,49 @@
+syntax= "proto3";
+
+package Schedule;
+
+option go_package = ".;grpc";
+
+service ScheduleService{
+  rpc GetSchedule (GetScheduleRequest) returns (Schedule);
+  rpc GetSchedules (UserID) returns (Schedules);
+  rpc CreateSchedule (CreateScheduleRequest) returns (ScheduleID);
+  rpc NextTakings (UserID) returns (Takings);
+}
+
+message GetScheduleRequest{
+  int64 userID = 1;
+  int64 scheduleID=2;
+}
+message Schedule{
+  string medicamentName=1;
+  bool isActual=2;
+  repeated string takings=3;
+}
+
+message UserID{
+  int64 userID = 1;
+}
+
+message Schedules{
+  repeated Schedule currentSchedules=1;
+}
+
+message CreateScheduleRequest{
+   string medicamentName=1;
+   int64 userId=2;
+   int64 receptionsPerDay=3;
+   int64 duration=4;
+}
+message ScheduleID{
+  int64 scheduleID = 1;
+}
+
+message Taking {
+  string name=1;
+  string time=2;
+}
+
+message Takings{
+  repeated Taking takings=1;
+}

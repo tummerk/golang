@@ -1,11 +1,109 @@
 openapi: 3.0.3
 info:
-  title: Schedules API
+  title: schedule API
   version: 1.0.0
-  description: API для работы с расписаниями
+  description: API для работы с расписаниями приёма лекарств
 servers:
   - url: http://localhost:5252/v1
-paths: {}
+paths:
+  /schedules:
+    get:
+      tags:
+        - schedules
+      summary: получить список расписаний по user_id
+      description: Возвращает список расписаний конкретного пользователя
+      parameters:
+        - name: user_id
+          in: query
+          description: Идентификатор пользователя
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+      responses:
+        '200':
+          description: Успешный ответ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/schedule'
+        '400':
+          description: Неверный запрос
+
+  /schedule:
+    get:
+      summary: Получить данные о конкретном расписании с графиком приемов на день
+      tags:
+        - schedules
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Идентификатор пользователя
+        - name: schedule_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Идентификатор расписания
+      responses:
+        200:
+          description: Данные о расписании и графике приемов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/schedule'
+        400:
+          description: Некорректный запрос
+    post:
+      summary: Создать новое расписание приема лекарств
+      operationId: createSchedule
+      tags:
+        - schedules
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/schedule'
+      responses:
+        200:
+          description: Расписание успешно создано
+          content:
+            application/json:
+              schema:
+                type: integer
+                description: id расписания
+        400:
+          description: Некорректный запрос (например, отсутствуют обязательные поля)
+
+  /next_takings:
+    get:
+      summary: получить ближайшие приемы лекарств по user_id
+      tags:
+        - schedules
+      parameters:
+        - name: user_id
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Идентификатор пользователя
+      responses:
+        200:
+          description: Список ближайших приемов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/takings'
+        400:
+          description: Некорректный запрос
+
 components:
   schemas:
     taking:
@@ -24,7 +122,7 @@ components:
       type: array
       items:
         $ref: '#/components/schemas/taking'
-    Schedule:
+    schedule:
       type: object
       properties:
         medicamentName:
@@ -36,11 +134,9 @@ components:
             type: string
           example: ["23:30","3:00"]
       required:
-        - id
         - medicamentName
-        - receptionsPerDay
-        - dateStart
-        - dateEnd
+        - takings
+
 
     Error:
       type: object

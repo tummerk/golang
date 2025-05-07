@@ -1,22 +1,17 @@
-GENERATOR = openapi-generator-cli
+GENERATOR = oapi-codegen
 SPEC = openapi.yaml
-API_OUT_DIR = generatedOpenapi
-PROTO_DIR = ./generatedProtobuff/proto
-PROTO_GEN_DIR = ./generatedProtobuff/gen
+OPENAPI_OUT_DIR = pkg/rest
+PROTO_DIR = internal/server/generated/grpc/
 PROTO_FILE = schedule.proto
 
 generateOpenapi:
-	$(GENERATOR) generate \
-		-i $(SPEC) \
-		-g go-server \
-		-o generatedOpenapi
-		--additional-properties=packageName=schedules,serverPort=5252
+	$(GENERATOR) -generate types -package rest openapi.yaml > $(OPENAPI_OUT_DIR)/types.gen.go
 
 generateProto:
-	protoc --proto_path=./generatedProtobuff/proto \
-               --go_out=./generatedProtobuff/gen \
-               --go-grpc_out=./generatedProtobuff/gen \
-               ./generatedProtobuff/proto/schedule.proto
+	protoc --proto_path=$(PROTO_DIR) \
+               --go_out=$(PROTO_DIR) \
+               --go-grpc_out=$(PROTO_DIR) \
+               $(PROTO_DIR)/schedule.proto
 
 clean:
 	rm -rf $(API_OUT_DIR)

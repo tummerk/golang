@@ -3,12 +3,16 @@ module github.com/tummerk/golang/schedules
 go 1.23.7
 
 require (
+	github.com/caarlos0/env/v10 v10.0.0
+	github.com/go-chi/chi/v5 v5.2.1
 	github.com/golang-migrate/migrate/v4 v4.18.2
-	github.com/google/uuid v1.6.0
-	github.com/gorilla/mux v1.8.1
+	github.com/golang/protobuf v1.5.4
+	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/jwx/v2 v2.1.5
 	github.com/lib/pq v1.10.9
+	github.com/rs/xid v1.6.0
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/sync v0.14.0
 	google.golang.org/grpc v1.71.1
 	google.golang.org/protobuf v1.36.4
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
