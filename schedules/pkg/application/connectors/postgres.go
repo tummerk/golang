@@ -21,6 +21,10 @@ func (p *Postgres) Client(ctx context.Context) *sql.DB {
 		if e != nil {
 			logger(ctx).Error("Error connecting to Postgres", slog.String("error", e.Error()))
 		}
+		e = p.db.PingContext(ctx)
+		if e != nil {
+			logger(ctx).Error("Error connecting to Postgres", slog.String("error", e.Error()))
+		}
 		logger(ctx).Info("Successfully connected to Postgres database")
 	})
 	return p.db

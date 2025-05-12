@@ -80,15 +80,15 @@ func (app *App) Run() {
 			slog.String("Addr", app.cfg.Grpc.Addr))
 	}
 	app.httpServer.Run(ctx, g, app.newHTTPServer(ctx, app.service))
-	app.grpcServer.Run(ctx, g, app.newGrpcServer(ctx, app.service), grpcListener)
+	app.grpcServer.Run(ctx, g, NewGrpcServer(ctx, app.service, []byte(app.cfg.Jwe.Key)), grpcListener)
 	g.Wait()
 }
 
 func (app *App) newHTTPServer(ctx context.Context, service serviceSchedule.ScheduleService) *http.Server {
 	router := chi.NewRouter()
 
-	router.Use(middlewarex.TraceID, middlewarex.Logger)
-	rest.NewServer(&service).RegisterRoutes(router)
+	router.Use(middlewarex.TraceID, middlewarex.UserID([]byte(app.cfg.Jwe.Key)), middlewarex.Logger)
+	restServer.NewServer(&service).RegisterRoutes(router)
 	return &http.Server{
 		BaseContext: func(net.Listener) context.Context {
 			return ctx
@@ -98,9 +98,12 @@ func (app *App) newHTTPServer(ctx context.Context, service serviceSchedule.Sched
 	}
 }
 
-func (app *App) newGrpcServer(ctx context.Context, service serviceSchedule.ScheduleService) *grpc.Server {
+func NewGrpcServer(ctx context.Context, service serviceSchedule.ScheduleService, Key []byte) *grpc.Server {
 	logger := contextx.LoggerFromContextOrDefault(ctx)
-	gRPCServer := grpc.NewServer(grpc.ChainUnaryInterceptor(interceptorx.TraceIDInterceptor(), interceptorx.LoggingInterceptor(logger)))
+	gRPCServer := grpc.NewServer(grpc.ChainUnaryInterceptor(
+		interceptorx.TraceIDInterceptor(),
+		interceptorx.UserIDInterceptor(Key),
+		interceptorx.LoggingInterceptor(logger)))
 	Schedulegrpc.Register(gRPCServer, &service)
 	return gRPCServer
 }

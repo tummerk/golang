@@ -1,4 +1,4 @@
-package rest
+package restServer
 
 import "github.com/tummerk/golang/schedules/pkg/contextx"
 

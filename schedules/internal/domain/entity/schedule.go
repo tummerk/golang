@@ -21,6 +21,7 @@ type Schedule struct {
 	ReceptionsPerDay int
 	DateStart        time.Time
 	DateEnd          time.Time
+	UserID           int
 }
 
 type Logger interface {

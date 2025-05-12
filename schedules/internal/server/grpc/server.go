@@ -1,4 +1,4 @@
-package Schedulegrpc
+package grpcServer
 
 import (
 	"context"
@@ -12,9 +12,9 @@ import (
 
 type ScheduleService interface {
 	Create(ctx context.Context, medicamentName string, userId, receptionsPerDay, duration int) (int, error)
-	GetUserSchedules(ctx context.Context, userID int) ([]entity.Schedule, error, []entity.Schedule)
-	GetUserSchedule(ctx context.Context, userID, scheduleID int) (entity.Schedule, error, bool)
-	NextTakings(ctx context.Context, userID int) ([]value.Taking, error)
+	GetUserSchedules(ctx context.Context) ([]entity.Schedule, error, []entity.Schedule)
+	GetUserSchedule(ctx context.Context, scheduleID int) (entity.Schedule, error, bool)
+	NextTakings(ctx context.Context) ([]value.Taking, error)
 }
 
 type serverAPI struct {
@@ -27,7 +27,7 @@ func Register(gRPC *grpc.Server, Service ScheduleService) {
 }
 
 func (s *serverAPI) GetSchedule(ctx context.Context, req *grpcGen.GetScheduleRequest) (*grpcGen.Schedule, error) {
-	schedule, e, isRelevant := s.Service.GetUserSchedule(ctx, int(req.GetUserID()), int(req.GetScheduleID()))
+	schedule, e, isRelevant := s.Service.GetUserSchedule(ctx, int(req.GetScheduleID()))
 	if e != nil {
 		log.Print(e)
 	}
@@ -40,7 +40,7 @@ func (s *serverAPI) GetSchedule(ctx context.Context, req *grpcGen.GetScheduleReq
 }
 
 func (s *serverAPI) GetSchedules(ctx context.Context, req *grpcGen.UserID) (*grpcGen.Schedules, error) {
-	currentSchedules, e, _ := s.Service.GetUserSchedules(ctx, int(req.GetUserID()))
+	currentSchedules, e, _ := s.Service.GetUserSchedules(ctx)
 	if e != nil {
 		log.Print(e)
 	}
@@ -77,7 +77,7 @@ func (s *serverAPI) CreateSchedule(ctx context.Context, req *grpcGen.CreateSched
 }
 
 func (s *serverAPI) NextTakings(ctx context.Context, req *grpcGen.UserID) (*grpcGen.Takings, error) {
-	takings, e := s.Service.NextTakings(ctx, int(req.UserID))
+	takings, e := s.Service.NextTakings(ctx)
 	if e != nil {
 		log.Print(e)
 	}

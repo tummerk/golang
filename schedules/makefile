@@ -15,3 +15,7 @@ generateProto:
 
 clean:
 	rm -rf $(API_OUT_DIR)
+
+test:
+	go test .\...
+

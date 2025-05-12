@@ -3,13 +3,11 @@ package entity
 import (
 	"context"
 	"github.com/stretchr/testify/assert"
-	"log/slog"
 	"testing"
 )
 
 func TestScheduleOnDay(t *testing.T) {
-	ctx := context.WithValue(context.Background(), "traceID", "test")
-	logger := logger.NewLogger("schedule.log", slog.LevelDebug)
+	ctx := context.Background()
 	tests := []struct {
 		name     string
 		schedule Schedule
@@ -24,7 +22,7 @@ func TestScheduleOnDay(t *testing.T) {
 	}
 	for i, test := range tests {
 		t.Run(test.name, func(t *testing.T) {
-			result := test.schedule.ScheduleOnDay(ctx, logger)
+			result := test.schedule.ScheduleOnDay(ctx)
 			if !assert.Equal(t, result, test.expected) {
 				t.Errorf("Test %d failed: expected %d, got %d", i, test.expected, result)
 			}

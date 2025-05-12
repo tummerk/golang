@@ -1,4 +1,4 @@
-package rest
+package restServer
 
 import "github.com/go-chi/chi/v5"
 

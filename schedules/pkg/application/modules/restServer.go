@@ -26,7 +26,7 @@ func (h HTTPServer) Run(
 			defer cancel()
 
 			if err := httpServer.Shutdown(ctx); err != nil {
-				logger(ctx).Error("http server shutdown error:", err)
+				logger(ctx).Error("http server shutdown error:", slog.String("error", err.Error()))
 			}
 		}()
 

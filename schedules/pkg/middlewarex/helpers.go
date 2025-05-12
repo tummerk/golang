@@ -2,9 +2,7 @@ package middlewarex
 
 import (
 	"context"
-	"github.com/tummerk/golang/schedules/internal/config"
 	"github.com/tummerk/golang/schedules/pkg/contextx"
-	"github.com/tummerk/golang/schedules/pkg/utils"
 	"log/slog"
 	"net/http"
 	"time"
@@ -12,9 +10,8 @@ import (
 
 func RequestLogRestapi(r *http.Request) slog.Attr {
 	query := r.URL.Query()
-	userID := query.Get("user_id")
+	maskUserID, _ := contextx.MaskUserIDFromContext(r.Context())
 	scheduleID := query.Get("schedule_id")
-	userID, _ = utils.Encrypt(userID, config.Key)
 	requestInfo := []slog.Attr{
 		slog.Any("traceID", contextx.TraceIDFromContext(r.Context())),
 		slog.String("method", r.Method),
@@ -22,7 +19,7 @@ func RequestLogRestapi(r *http.Request) slog.Attr {
 		slog.String("host", r.Host),
 		slog.String("user_agent", r.UserAgent()),
 		slog.String("ip", r.RemoteAddr),
-		slog.String("userID", userID),
+		slog.String("userID", maskUserID.String()),
 	}
 	if scheduleID != "" {
 		requestInfo = append(requestInfo, slog.String("scheduleID", scheduleID))

@@ -136,8 +136,6 @@ components:
       required:
         - medicamentName
         - takings
-
-
     Error:
       type: object
       properties:

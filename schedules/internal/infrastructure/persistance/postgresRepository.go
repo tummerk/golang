@@ -3,12 +3,9 @@ package persistance
 import (
 	"context"
 	"database/sql"
-	"github.com/tummerk/golang/schedules/internal/config"
 	serviceSchedule "github.com/tummerk/golang/schedules/internal/domain/service/schedule"
 	"github.com/tummerk/golang/schedules/pkg/contextx"
-	"github.com/tummerk/golang/schedules/pkg/utils"
 	"log/slog"
-	"strconv"
 	"time"
 )
 
@@ -32,31 +29,31 @@ func (r *ScheduleRepository) GetUserSchedules(ctx context.Context, userID int) (
 	traceID := slog.Any("traceID", contextx.TraceIDFromContext(ctx))
 	rows, e := r.DB.Query(`SELECT "id","medicament_name","receptions_per_day","date_start","date_end"
 							   FROM schedules WHERE user_id = $1`, userID)
-	userIdEncode, _ := utils.Encrypt(strconv.Itoa(userID), config.Key)
+	userIdEncode, _ := contextx.MaskUserIDFromContext(ctx)
 	if e != nil {
 		logger(ctx).Error("Error getting user schedules from postgres", traceID,
 			slog.String("error", e.Error()),
-			slog.String("userID", userIdEncode))
+			slog.String("userID", userIdEncode.String()))
 		return nil, e
 	}
 	logger(ctx).Info("Successfully got user schedules from postgres", traceID,
-		slog.String("userID", userIdEncode))
+		slog.String("userID", userIdEncode.String()))
 	return rows, e
 }
 
 func (r *ScheduleRepository) GetUserSchedule(ctx context.Context, userID, scheduleID int) (serviceSchedule.Rows, error) {
 	traceID := slog.Any("traceID", contextx.TraceIDFromContext(ctx))
-	userIdEncode, _ := utils.Encrypt(strconv.Itoa(userID), config.Key)
+	userIdEncode, _ := contextx.MaskUserIDFromContext(ctx)
 	row, e := r.DB.Query(`SELECT "id","medicament_name","receptions_per_day","date_start","date_end"
 							   FROM schedules WHERE user_id = $1 and id = $2`, userID, scheduleID)
 	if e != nil {
 		logger(ctx).Error("Error getting schedule from postgres", traceID, slog.String("error", e.Error()),
-			slog.String("userID", userIdEncode),
+			slog.String("userID", userIdEncode.String()),
 			slog.Int("scheduleID", scheduleID))
 		return nil, e
 	}
 	logger(ctx).Info("Successfully got schedule from postgres", traceID,
-		slog.String("userID", userIdEncode),
+		slog.String("userID", userIdEncode.String()),
 		slog.Int("scheduleID", scheduleID))
 	row.Next()
 	return row, nil

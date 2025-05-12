@@ -1,4 +1,4 @@
-package Schedulegrpc
+package grpcServer
 
 import "github.com/tummerk/golang/schedules/pkg/contextx"
 

@@ -1,10 +1,11 @@
-package rest
+package restServer
 
 import (
 	"context"
 	"encoding/json"
 	"github.com/tummerk/golang/schedules/internal/domain/entity"
 	"github.com/tummerk/golang/schedules/internal/domain/value"
+	"github.com/tummerk/golang/schedules/pkg/contextx"
 	"github.com/tummerk/golang/schedules/pkg/rest"
 	"net/http"
 	"strconv"
@@ -12,9 +13,9 @@ import (
 
 type ScheduleService interface {
 	Create(ctx context.Context, medicamentName string, userId, receptionsPerDay, duration int) (int, error)
-	GetUserSchedules(ctx context.Context, userID int) ([]entity.Schedule, error, []entity.Schedule)
-	GetUserSchedule(ctx context.Context, userID, scheduleID int) (entity.Schedule, error, bool)
-	NextTakings(ctx context.Context, userID int) ([]value.Taking, error)
+	GetUserSchedules(ctx context.Context) ([]entity.Schedule, error, []entity.Schedule)
+	GetUserSchedule(ctx context.Context, scheduleID int) (entity.Schedule, error, bool)
+	NextTakings(ctx context.Context) ([]value.Taking, error)
 }
 
 type Server struct {
@@ -34,14 +35,14 @@ func (s Server) GetUserSchedules(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := r.URL.Query()
-	userID, e := strconv.Atoi(query.Get("user_id"))
+	userID, e := contextx.UserIDFromContext(r.Context())
+	_, e = strconv.Atoi(userID.String())
 	if e != nil {
 		http.Error(w, "укажите число!", http.StatusBadRequest)
 		return
 	}
 
-	currentSchedules, e, pastSchedules := s.Service.GetUserSchedules(r.Context(), userID)
+	currentSchedules, e, pastSchedules := s.Service.GetUserSchedules(r.Context())
 
 	if e != nil || len(currentSchedules)+len(pastSchedules) == 0 {
 		http.Error(w, "Такому пользователю лекарства не назначались!", http.StatusBadRequest)
@@ -56,7 +57,7 @@ func (s Server) GetUserSchedules(w http.ResponseWriter, r *http.Request) {
 	pastSchedulesJson := []rest.Schedule{}
 	for _, schedule := range pastSchedules {
 		takings := schedule.ScheduleOnDayString(r.Context())
-		currentSchedulesJson = append(currentSchedulesJson, rest.Schedule{MedicamentName: schedule.MedicamentName, Takings: takings})
+		pastSchedulesJson = append(pastSchedulesJson, rest.Schedule{MedicamentName: schedule.MedicamentName, Takings: takings})
 	}
 
 	response := map[string]interface{}{
@@ -89,7 +90,12 @@ func (s Server) CreateUserSchedule(w http.ResponseWriter, r *http.Request) {
 		scheduleID, e := s.Service.Create(r.Context(), medicamentName, userID, receptionsPerDay, duration)
 
 		//возвращаем ID нового расписания
-		w.Write([]byte(strconv.Itoa(scheduleID)))
+		response := struct {
+			ID int `json:"id"`
+		}{ID: scheduleID}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	} else {
 		http.Error(w, "неизвестный метод", http.StatusMethodNotAllowed)
 	}
@@ -97,7 +103,7 @@ func (s Server) CreateUserSchedule(w http.ResponseWriter, r *http.Request) {
 func (s Server) GetUserSchedule(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet { //поиск schedule по ID и user_id
 		query := r.URL.Query()
-		userID, e := strconv.Atoi(query.Get("user_id"))
+		_, e := contextx.UserIDFromContext(r.Context())
 		if e != nil {
 			http.Error(w, "user_id указан неверно", http.StatusBadRequest)
 			return
@@ -107,14 +113,14 @@ func (s Server) GetUserSchedule(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "schedule_id указан неверно", http.StatusBadRequest)
 			return
 		}
-		schedule, e, isRelevant := s.Service.GetUserSchedule(r.Context(), userID, scheduleID)
+		schedule, e, isRelevant := s.Service.GetUserSchedule(r.Context(), scheduleID)
 
 		takings := schedule.ScheduleOnDayString(r.Context())
 		var scheduleJSON = rest.Schedule{MedicamentName: schedule.MedicamentName, Takings: takings}
 
 		response := map[string]interface{}{
-			"scheduleJSON": scheduleJSON,
-			"isRelevant":   isRelevant,
+			"schedule":   scheduleJSON,
+			"isRelevant": isRelevant,
 		}
 		json.NewEncoder(w).Encode(response)
 	} else {
@@ -128,14 +134,14 @@ func (s Server) NextTakings(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	query := r.URL.Query()
-	userID, e := strconv.Atoi(query.Get("user_id"))
+	userID, e := contextx.UserIDFromContext(r.Context())
+	_, e = strconv.Atoi(userID.String())
 	if e != nil {
 		http.Error(w, "укажите число!", http.StatusBadRequest)
 		return
 	}
 
-	nextTakings, e := s.Service.NextTakings(r.Context(), userID)
+	nextTakings, e := s.Service.NextTakings(r.Context())
 	if e != nil {
 		http.Error(w, "неверный user_id", http.StatusBadRequest)
 		return

@@ -7,6 +7,7 @@ import (
 	"github.com/tummerk/golang/schedules/pkg/contextx"
 	"github.com/tummerk/golang/schedules/pkg/utils"
 	"log/slog"
+	"strconv"
 
 	"time"
 )
@@ -52,8 +53,15 @@ func (service *ScheduleService) Create(ctx context.Context, medicamentName strin
 	return scheduleID, nil
 }
 
-func (service *ScheduleService) GetUserSchedules(ctx context.Context, userID int) ([]entity.Schedule, error, []entity.Schedule) {
+func (service *ScheduleService) GetUserSchedules(ctx context.Context) ([]entity.Schedule, error, []entity.Schedule) {
 	traceID := slog.Any("traceID", contextx.TraceIDFromContext(ctx))
+	userIDstr, e := contextx.UserIDFromContext(ctx)
+	if e != nil {
+		logger(ctx).Error("error getting userID", traceID,
+			slog.String("error", e.Error()))
+	}
+	userID, _ := strconv.Atoi(userIDstr.String())
+	maskTraceID := contextx.TraceIDFromContext(ctx)
 	rows, e := service.Repository.GetUserSchedules(ctx, userID)
 	if e != nil {
 		logger(ctx).Error("error while creating user schedule", traceID,
@@ -75,12 +83,18 @@ func (service *ScheduleService) GetUserSchedules(ctx context.Context, userID int
 			pastSchedules = append(pastSchedules, s)
 		}
 	}
-	logger(ctx).Info("get user schedules", traceID, "userID", userID)
+	logger(ctx).Info("get user schedules", traceID, "userID", maskTraceID)
 	return currentSchedules, nil, pastSchedules
 }
 
-func (service *ScheduleService) GetUserSchedule(ctx context.Context, userID, scheduleID int) (entity.Schedule, error, bool) {
+func (service *ScheduleService) GetUserSchedule(ctx context.Context, scheduleID int) (entity.Schedule, error, bool) {
 	traceID := slog.Any("traceID", contextx.TraceIDFromContext(ctx))
+	userIDstr, e := contextx.UserIDFromContext(ctx)
+	if e != nil {
+		logger(ctx).Error("error getting userID", traceID,
+			slog.String("error", e.Error()))
+	}
+	userID, _ := strconv.Atoi(userIDstr.String())
 	row, e := service.Repository.GetUserSchedule(ctx, userID, scheduleID)
 	if e != nil {
 		logger(ctx).Error("error while getting user schedule", traceID, slog.String("error", e.Error()))
@@ -100,9 +114,22 @@ func (service *ScheduleService) GetUserSchedule(ctx context.Context, userID, sch
 	return schedule, nil, isRelevant
 }
 
-func (service *ScheduleService) NextTakings(ctx context.Context, userID int) ([]value.Taking, error) {
+func (service *ScheduleService) NextTakings(ctx context.Context) ([]value.Taking, error) {
 	traceID := slog.Any("traceID", contextx.TraceIDFromContext(ctx))
-	schedules, e, _ := service.GetUserSchedules(ctx, userID)
+	maskUserId, e := contextx.MaskUserIDFromContext(ctx)
+	if e != nil {
+		return nil, e
+	}
+	userIDstr, e := contextx.UserIDFromContext(ctx)
+	if e != nil {
+		logger(ctx).Error("error getting userID", traceID,
+			slog.String("error", e.Error()))
+	}
+	_, e = strconv.Atoi(userIDstr.String())
+	if e != nil {
+		logger(ctx).Error("error parsing userID from string", traceID)
+	}
+	schedules, e, _ := service.GetUserSchedules(ctx)
 
 	var nextTakings []value.Taking
 
@@ -128,6 +155,6 @@ func (service *ScheduleService) NextTakings(ctx context.Context, userID int) ([]
 			}
 		}
 	}
-	logger(ctx).Info("get user next takings", traceID, slog.Int("user", userID))
+	logger(ctx).Info("get user next takings", traceID, slog.String("user_id", maskUserId.String()))
 	return nextTakings, nil
 }
