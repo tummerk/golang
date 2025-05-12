@@ -19,6 +19,7 @@ COPY . .
 RUN make generateOpenapi
 RUN make generateProto
 
+RUN make test
 
 RUN CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /app/bin/schedules ./cmd/schedules
 

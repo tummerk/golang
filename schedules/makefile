@@ -17,5 +17,5 @@ clean:
 	rm -rf $(API_OUT_DIR)
 
 test:
-	go test .\...
+	go list ./... | grep -v '/tests'
 
