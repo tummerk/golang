@@ -1,6 +1,8 @@
 services:
   db:
     image: postgres:14
+    ports:
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
@@ -11,6 +13,8 @@ services:
     build:
       context: .
       dockerfile: .docker/Dockerfile
+    environment:
+      TZ: Europe/Kaliningrad
     ports:
       - "8080:8080"
       - "12345:12345"

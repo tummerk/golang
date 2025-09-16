@@ -137,7 +137,6 @@ func (service *ScheduleService) NextTakings(ctx context.Context) ([]value.Taking
 		logger(ctx).Error("error while getting user schedules", traceID)
 		return nextTakings, e
 	}
-
 	minuteFromStartDay := utils.MinuteFromStartDay(time.Now())
 	for _, schedule := range schedules {
 		for _, minute := range schedule.ScheduleOnDay(ctx) {

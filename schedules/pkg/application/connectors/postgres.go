@@ -42,12 +42,14 @@ func (p *Postgres) Close(ctx context.Context) {
 }
 
 func (p *Postgres) RunMigrations(ctx context.Context) error {
-	m, e := migrate.New("file://migrations", p.DSN)
+	m, e := migrate.New("file://migrations", "postgres://postgres:pass123@db:5432/schedules?sslmode=disable")
 	if e != nil {
+		logger(ctx).Error("Error running migrations",
+			slog.String("error", e.Error()))
 		return e
 	}
 	defer m.Close()
-	if e = m.Up(); e != nil && e != migrate.ErrNoChange {
+	if e = m.Up(); e != nil {
 		logger(ctx).Error("Error running migrations",
 			slog.String("error", e.Error()))
 		return e
